@@ -15,6 +15,8 @@ namespace Abissal.UI
         [SerializeField] private Image messageImage;
         [SerializeField] private Sprite startMessage;
         [SerializeField] private Sprite returnMessage;
+        [SerializeField] private SurfaceZone surfaceZone;
+        [SerializeField] private Sprite missingSampleMessage;
         [SerializeField, Min(0.1f)] private float visibleSeconds = 4f;
         [SerializeField, Min(0.1f)] private float fadeSeconds = 0.6f;
 
@@ -31,6 +33,7 @@ namespace Abissal.UI
         {
             GameManager.Instance.StateChanged += OnStateChanged;
             sampleTracker.SampleCollected += OnSampleCollected;
+            surfaceZone.ReachedWithoutMainSample += OnReachedWithoutMainSample;
         }
 
         private void OnDestroy()
@@ -41,6 +44,12 @@ namespace Abissal.UI
             }
 
             sampleTracker.SampleCollected -= OnSampleCollected;
+            surfaceZone.ReachedWithoutMainSample -= OnReachedWithoutMainSample;
+        }
+
+        private void OnReachedWithoutMainSample()
+        {
+            Show(missingSampleMessage);
         }
 
         private void Update()

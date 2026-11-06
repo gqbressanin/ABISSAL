@@ -1,4 +1,5 @@
 using System;
+using Abissal.Expedition;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,6 +18,9 @@ namespace Abissal.Core
 
         public GameState State { get; private set; } = GameState.Title;
         public GameOverReason DefeatReason { get; private set; } = GameOverReason.None;
+
+        /// <summary>Tempo de expedição, contado apenas enquanto se joga.</summary>
+        public float ExpeditionSeconds { get; private set; }
 
         public event Action<GameState> StateChanged;
 
@@ -39,6 +43,14 @@ namespace Abissal.Core
             }
         }
 
+        private void Update()
+        {
+            if (State == GameState.Playing)
+            {
+                ExpeditionSeconds += Time.deltaTime;
+            }
+        }
+
         /// <summary>Chamado quando a transição da tela inicial termina.</summary>
         public void BeginExpedition()
         {
@@ -46,6 +58,18 @@ namespace Abissal.Core
             {
                 SetState(GameState.Playing);
             }
+        }
+
+        /// <summary>Encerra com vitória, mas só se a regra permitir. Retorna se a vitória aconteceu.</summary>
+        public bool TryWinExpedition(bool hasMainSample)
+        {
+            if (State != GameState.Playing || !ExpeditionRules.CanWinExpedition(hasMainSample))
+            {
+                return false;
+            }
+
+            SetState(GameState.Victory);
+            return true;
         }
 
         public void LoseExpedition(GameOverReason reason)

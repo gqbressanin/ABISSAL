@@ -36,7 +36,51 @@ namespace Abissal.EditorTools
             GenerateEffects();
             GenerateTitle();
             GenerateInterface();
+            GenerateGlyphs();
             AssetDatabase.Refresh();
+            BuildFontAsset();
+        }
+
+        /// <summary>Cada letra vira um PNG branco com contorno, que a interface pode colorir.</summary>
+        private static void GenerateGlyphs()
+        {
+            const int width = PixelFont.GlyphWidth + 2;
+            const int height = PixelFont.GlyphHeight + 6;
+            const int baseTop = height - 4;
+            Color32 white = PixelCanvas.Hex("ffffff");
+
+            foreach (char character in PixelFont.Characters)
+            {
+                var canvas = new PixelCanvas(width, height);
+                int top = baseTop + PixelFont.AccentHeight(character);
+                canvas.DrawRows(1, top, PixelFont.GetGlyph(character), c => c == '#' ? white : (Color32?)null);
+                canvas.Outline(Ink);
+                canvas.Save(Root + $"UI/Glyphs/glyph_{(int)character:X4}.png");
+            }
+        }
+
+        private static void BuildFontAsset()
+        {
+            const string fontPath = "Assets/_Abissal/Data/PixelFontData.asset";
+            var font = AssetDatabase.LoadAssetAtPath<Abissal.UI.PixelFontData>(fontPath);
+
+            if (font == null)
+            {
+                font = ScriptableObject.CreateInstance<Abissal.UI.PixelFontData>();
+                AssetDatabase.CreateAsset(font, fontPath);
+            }
+
+            var characters = new List<char>(PixelFont.Characters);
+            var sprites = new Sprite[characters.Count];
+
+            for (int i = 0; i < characters.Count; i++)
+            {
+                sprites[i] = AssetDatabase.LoadAssetAtPath<Sprite>(Root + $"UI/Glyphs/glyph_{(int)characters[i]:X4}.png");
+            }
+
+            font.Configure(new string(characters.ToArray()), sprites, PixelFont.GlyphWidth + 1);
+            EditorUtility.SetDirty(font);
+            AssetDatabase.SaveAssets();
         }
 
         private static void GenerateEnvironment()
@@ -842,6 +886,9 @@ namespace Abissal.EditorTools
         private static void GenerateInterface()
         {
             DrawLabel("ESPAÇO PARA COLETAR", "ffe08a", 1).Save(Root + "UI/prompt_collect.png");
+            DrawLabel("A AMOSTRA PRINCIPAL AINDA NÃO FOI COLETADA", "ff9a7a", 1).Save(Root + "UI/objective_missing.png");
+            DrawLabel("MISSÃO CONCLUÍDA", "ffe08a", 2).Save(Root + "UI/victory_title.png");
+            DrawLabel("PRESSIONE ESPAÇO PARA JOGAR NOVAMENTE", "f2fffb", 1).Save(Root + "UI/victory_prompt.png");
             DrawLabel("ENCONTRE A AMOSTRA PRINCIPAL NO FUNDO DO OCEANO", "f2fffb", 1).Save(Root + "UI/objective_start.png");
             DrawLabel("AMOSTRA COLETADA - RETORNE À SUPERFÍCIE", "ffe08a", 1).Save(Root + "UI/objective_return.png");
             DrawLabel("GAME OVER", "ff7a66", 3).Save(Root + "UI/gameover_title.png");
@@ -886,7 +933,7 @@ namespace Abissal.EditorTools
         private static PixelCanvas DrawLabel(string text, string colorHex, int scale)
         {
             int advance = (PixelFont.GlyphWidth + 1) * scale;
-            var canvas = new PixelCanvas(text.Length * advance + 4, (PixelFont.GlyphHeight + 3) * scale + 4);
+            var canvas = new PixelCanvas(text.Length * advance + 4, (PixelFont.GlyphHeight + 5) * scale + 4);
             Color32 color = PixelCanvas.Hex(colorHex);
             DrawText(canvas, text, 2, 2 * scale + 2, scale, _ => color, 0, 0);
             canvas.Outline(Ink);
@@ -918,7 +965,7 @@ namespace Abissal.EditorTools
                             continue;
                         }
 
-                        int baseRow = PixelFont.GlyphHeight - 1 - row;
+                        int baseRow = PixelFont.GlyphHeight - 1 + PixelFont.AccentHeight(text[index]) - row;
                         int px = x + offsetX + (index * (PixelFont.GlyphWidth + 1) + column) * scale;
                         int py = y + offsetY + baseRow * scale;
 
