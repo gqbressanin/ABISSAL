@@ -483,6 +483,71 @@ namespace Abissal.EditorTools
             }
 
             DrawCrystal().Save(Root + "Props/crystal.png");
+            DrawAltar().Save(Root + "Props/altar.png");
+
+            for (int frame = 0; frame < 4; frame++)
+            {
+                DrawMainSample(frame / 4f * Mathf.PI * 2f).Save(Root + $"Samples/sample_main_{frame}.png");
+            }
+        }
+
+        /// <summary>Cápsula grande e dourada, bem diferente dos frascos das amostras secundárias.</summary>
+        private static PixelCanvas DrawMainSample(float phase)
+        {
+            const int width = 28;
+            const int height = 38;
+            var canvas = new PixelCanvas(width, height);
+            const float centerX = 13.5f;
+            const float centerY = 19f;
+            float coreRadius = 6.5f + Mathf.Sin(phase) * 1.2f;
+
+            for (int y = 7; y < height - 7; y++)
+            {
+                for (int x = 5; x < width - 5; x++)
+                {
+                    float dx = (x - centerX) / 9f;
+                    float dy = (y - centerY) / 13f;
+                    float distance = Mathf.Sqrt((x - centerX) * (x - centerX) + (y - centerY) * (y - centerY));
+
+                    if (dx * dx + dy * dy > 1f)
+                    {
+                        continue;
+                    }
+
+                    string hex = distance < coreRadius * 0.5f ? "ffffff"
+                        : distance < coreRadius ? "8ffff0"
+                        : "1f8fa8";
+                    canvas.Set(x, y, PixelCanvas.Hex(hex, (byte)(distance < coreRadius ? 255 : 170)));
+                }
+            }
+
+            canvas.FillRect(6, 3, 16, 4, PixelCanvas.Hex("f4b92f"));
+            canvas.FillRect(8, 1, 12, 2, PixelCanvas.Hex("c9701f"));
+            canvas.FillRect(6, height - 7, 16, 4, PixelCanvas.Hex("f4b92f"));
+            canvas.FillRect(8, height - 3, 12, 2, PixelCanvas.Hex("ffe08a"));
+            canvas.Outline(Ink);
+            return canvas;
+        }
+
+        private static PixelCanvas DrawAltar()
+        {
+            var canvas = new PixelCanvas(60, 18);
+
+            for (int y = 0; y < 16; y++)
+            {
+                int inset = y / 2;
+                canvas.FillRect(inset, y, 60 - inset * 2, 1, PixelCanvas.Hex(y % 4 == 0 ? "4e447f" : "3d3566"));
+            }
+
+            canvas.FillRect(8, 15, 44, 1, PixelCanvas.Hex("f4b92f"));
+
+            for (int x = 12; x < 50; x += 6)
+            {
+                canvas.FillRect(x, 6, 2, 4, PixelCanvas.Hex("8ffff0"));
+            }
+
+            canvas.Outline(PixelCanvas.Hex("1a1224"));
+            return canvas;
         }
 
         private static PixelCanvas DrawSampleVial(string liquidHex)
@@ -777,6 +842,8 @@ namespace Abissal.EditorTools
         private static void GenerateInterface()
         {
             DrawLabel("ESPAÇO PARA COLETAR", "ffe08a", 1).Save(Root + "UI/prompt_collect.png");
+            DrawLabel("ENCONTRE A AMOSTRA PRINCIPAL NO FUNDO DO OCEANO", "f2fffb", 1).Save(Root + "UI/objective_start.png");
+            DrawLabel("AMOSTRA COLETADA - RETORNE À SUPERFÍCIE", "ffe08a", 1).Save(Root + "UI/objective_return.png");
             DrawLabel("GAME OVER", "ff7a66", 3).Save(Root + "UI/gameover_title.png");
             DrawLabel("SEM OXIGÊNIO", "f2fffb", 1).Save(Root + "UI/gameover_oxygen.png");
             DrawLabel("VIDAS ESGOTADAS", "f2fffb", 1).Save(Root + "UI/gameover_lives.png");

@@ -11,6 +11,8 @@ namespace Abissal.Expedition
         [SerializeField] private SpriteRenderer[] visuals;
         [SerializeField] private Behaviour[] glowEffects;
         [SerializeField] private ParticleSystem collectBurst;
+        [Tooltip("Opcional: partículas contínuas ao redor da amostra.")]
+        [SerializeField] private ParticleSystem ambientParticles;
 
         public string SampleId => sampleId;
         public bool IsMainSample => isMainSample;
@@ -26,6 +28,11 @@ namespace Abissal.Expedition
             foreach (Behaviour glow in glowEffects)
             {
                 glow.enabled = false;
+            }
+
+            if (ambientParticles != null)
+            {
+                ambientParticles.Stop();
             }
 
             collectBurst.Play();
