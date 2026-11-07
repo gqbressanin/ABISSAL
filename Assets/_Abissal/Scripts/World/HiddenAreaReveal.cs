@@ -1,6 +1,5 @@
 using Abissal.Player;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace Abissal.World
 {
@@ -11,7 +10,7 @@ namespace Abissal.World
     /// </summary>
     public class HiddenAreaReveal : MonoBehaviour
     {
-        [SerializeField] private Tilemap coverLayer;
+        [SerializeField] private SpriteRenderer coverLayer;
         [SerializeField, Range(0f, 1f)] private float revealedAlpha = 0.12f;
         [SerializeField, Min(0.1f)] private float fadeSpeed = 3f;
 

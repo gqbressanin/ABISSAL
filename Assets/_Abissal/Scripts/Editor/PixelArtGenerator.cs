@@ -26,7 +26,6 @@ namespace Abissal.EditorTools
         public static void GenerateAll()
         {
             GenerateEnvironment();
-            GenerateTerrain();
             GeneratePlants();
             CreatureArt.Generate(Root);
             GenerateHazards();
@@ -190,50 +189,6 @@ namespace Abissal.EditorTools
                     {
                         canvas.Set(x, y, PixelCanvas.Hex("d8fff2", 46));
                     }
-                }
-            }
-
-            return canvas;
-        }
-
-        private static void GenerateTerrain()
-        {
-            string[] shallow = { "233347", "2c425a", "1a2839", "3f8f76", "74cf97" };
-            string[] middle = { "39335f", "4a4278", "2b2649", "4f68b0", "8aaaf0" };
-            string[] deep = { "3d3566", "4e447f", "2c264d", "6e42b8", "d195ff" };
-
-            SaveRockSet("rock", shallow, 11);
-            SaveRockSet("rock_mid", middle, 21);
-            SaveRockSet("rock_deep", deep, 41);
-        }
-
-        private static void SaveRockSet(string prefix, string[] palette, int seed)
-        {
-            DrawRockTile(seed, palette, false).Save(Root + $"Terrain/{prefix}_fill_0.png");
-            DrawRockTile(seed + 1, palette, false).Save(Root + $"Terrain/{prefix}_fill_1.png");
-            DrawRockTile(seed + 2, palette, true).Save(Root + $"Terrain/{prefix}_top.png");
-        }
-
-        /// <summary>Paleta: base, claro, escuro, cobertura e borda da cobertura.</summary>
-        private static PixelCanvas DrawRockTile(int seed, string[] palette, bool hasCover)
-        {
-            var random = new System.Random(seed);
-            var canvas = new PixelCanvas(16, 16);
-            canvas.FillRect(0, 0, 16, 16, PixelCanvas.Hex(palette[0]));
-
-            for (int i = 0; i < 26; i++)
-            {
-                string hex = palette[i % 2 == 0 ? 1 : 2];
-                canvas.FillRect(random.Next(16), random.Next(16), 1 + random.Next(3), 1 + random.Next(2), PixelCanvas.Hex(hex));
-            }
-
-            if (hasCover)
-            {
-                for (int x = 0; x < 16; x++)
-                {
-                    int depth = 2 + random.Next(3);
-                    canvas.FillRect(x, 16 - depth, 1, depth, PixelCanvas.Hex(palette[3]));
-                    canvas.Set(x, 15, PixelCanvas.Hex(palette[4]));
                 }
             }
 

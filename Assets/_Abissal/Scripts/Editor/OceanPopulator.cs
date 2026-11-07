@@ -288,37 +288,21 @@ namespace Abissal.EditorTools
             Instantiate(prefabs.Pufferfish, zone, new Vector2(-10f, -162f));
         }
 
-        private static int? FindFloor(int x, int fromY)
+        private static float? FindFloor(int x, int fromY)
         {
-            for (int y = fromY; y >= fromY - MaxSurfaceSearch; y--)
-            {
-                if (!LevelMapGenerator.IsWater(x, y))
-                {
-                    return y;
-                }
-            }
-
-            return null;
+            return LevelMapGenerator.FindFloor(x + 0.5f, fromY, MaxSurfaceSearch);
         }
 
-        private static int? FindCeiling(int x, int fromY)
+        private static float? FindCeiling(int x, int fromY)
         {
-            for (int y = fromY; y <= fromY + MaxSurfaceSearch; y++)
-            {
-                if (!LevelMapGenerator.IsWater(x, y))
-                {
-                    return y;
-                }
-            }
-
-            return null;
+            return LevelMapGenerator.FindCeiling(x + 0.5f, fromY, MaxSurfaceSearch);
         }
 
         private static void PlaceAnimatedPlant(Transform parent, string name, Sprite[] frames, int x, int fromY, float fps, Color tint)
         {
-            if (FindFloor(x, fromY) is int floor)
+            if (FindFloor(x, fromY) is float floor)
             {
-                SpriteRenderer plant = CreateSprite(name, parent, frames[0], new Vector3(x + 0.5f, floor + 0.9f), "Scenery", 5, litMaterial);
+                SpriteRenderer plant = CreateSprite(name, parent, frames[0], new Vector3(x + 0.5f, floor - 0.1f), "Scenery", 5, litMaterial);
                 plant.color = tint;
                 AddFrames(plant.gameObject, frames, fps);
             }
@@ -326,18 +310,18 @@ namespace Abissal.EditorTools
 
         private static void PlacePlant(Transform parent, string name, string spritePath, int x, int fromY, Color tint)
         {
-            if (FindFloor(x, fromY) is int floor)
+            if (FindFloor(x, fromY) is float floor)
             {
-                SpriteRenderer plant = CreateSprite(name, parent, LoadSprite(spritePath), new Vector3(x + 0.5f, floor + 0.9f), "Scenery", 12, litMaterial);
+                SpriteRenderer plant = CreateSprite(name, parent, LoadSprite(spritePath), new Vector3(x + 0.5f, floor - 0.1f), "Scenery", 12, litMaterial);
                 plant.color = tint;
             }
         }
 
         private static void PlaceGlowMushroom(Transform parent, int x, int fromY, bool hasLight)
         {
-            if (FindFloor(x, fromY) is int floor)
+            if (FindFloor(x, fromY) is float floor)
             {
-                SpriteRenderer mushroom = CreateSprite("Cogumelo_Brilhante", parent, LoadSprite("Plants/glow_mushroom"), new Vector3(x + 0.5f, floor + 0.9f), "Scenery", 12, unlitMaterial);
+                SpriteRenderer mushroom = CreateSprite("Cogumelo_Brilhante", parent, LoadSprite("Plants/glow_mushroom"), new Vector3(x + 0.5f, floor - 0.1f), "Scenery", 12, unlitMaterial);
 
                 if (hasLight)
                 {
@@ -348,32 +332,36 @@ namespace Abissal.EditorTools
 
         private static void PlaceSpikesOnFloor(Transform parent, GameObject prefab, int x, int fromY)
         {
-            if (FindFloor(x, fromY) is int floor)
+            if (FindFloor(x, fromY) is float floor)
             {
-                Instantiate(prefab, parent, new Vector3(x + 0.5f, floor + 0.95f));
-                BlockAround(x, floor + 1);
-                BlockAround(x + 1, floor + 1);
+                Instantiate(prefab, parent, new Vector3(x + 0.5f, floor - 0.05f));
+                int cell = Mathf.RoundToInt(floor);
+                BlockAround(x, cell);
+                BlockAround(x + 1, cell);
             }
         }
 
         private static void PlaceSpikesOnCeiling(Transform parent, GameObject prefab, int x, int fromY)
         {
-            if (FindCeiling(x, fromY) is int ceiling)
+            if (FindCeiling(x, fromY) is float ceiling)
             {
                 GameObject spikes = Instantiate(prefab, parent, new Vector3(x + 0.5f, ceiling + 0.05f));
                 spikes.transform.localScale = new Vector3(1f, -1f, 1f);
-                BlockAround(x, ceiling - 1);
-                BlockAround(x + 1, ceiling - 1);
+                int cell = Mathf.RoundToInt(ceiling) - 1;
+                BlockAround(x, cell);
+                BlockAround(x + 1, cell);
             }
         }
 
         private static void PlaceVent(Transform parent, GameObject prefab, int x, int fromY)
         {
-            if (FindFloor(x, fromY) is int floor)
+            if (FindFloor(x, fromY) is float floor)
             {
-                Instantiate(prefab, parent, new Vector3(x + 0.5f, floor + 0.95f));
+                Instantiate(prefab, parent, new Vector3(x + 0.5f, floor - 0.05f));
 
-                for (int y = floor + 1; y <= floor + 5; y++)
+                int cell = Mathf.RoundToInt(floor);
+
+                for (int y = cell; y <= cell + 4; y++)
                 {
                     BlockAround(x, y);
                 }
@@ -406,13 +394,13 @@ namespace Abissal.EditorTools
         /// <summary>O caranguejo anda de um lado para o outro sobre o chão, sem flutuar.</summary>
         private static void PlaceCrab(Transform parent, int x, int fromY)
         {
-            if (!(FindFloor(x, fromY) is int floor))
+            if (!(FindFloor(x, fromY) is float floor))
             {
                 return;
             }
 
             Sprite[] frames = LoadFrames("Creatures/crab", 4);
-            SpriteRenderer crab = CreateSprite("Caranguejo", parent, frames[0], new Vector3(x + 0.5f, floor + 1.4f), "Scenery", 13, litMaterial);
+            SpriteRenderer crab = CreateSprite("Caranguejo", parent, frames[0], new Vector3(x + 0.5f, floor + 0.4f), "Scenery", 13, litMaterial);
             AddFrames(crab.gameObject, frames, 6f);
 
             var swimmer = crab.gameObject.AddComponent<AmbientSwimmer>();
