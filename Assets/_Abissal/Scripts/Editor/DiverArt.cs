@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using static Abissal.EditorTools.PixelShapes;
 
 namespace Abissal.EditorTools
 {
@@ -223,11 +224,6 @@ namespace Abissal.EditorTools
             canvas.Set(20, 26, Brass[2]);
         }
 
-        private static Color32[] Shades(string baseHex, string lightHex, string darkHex)
-        {
-            return new[] { PixelCanvas.Hex(baseHex), PixelCanvas.Hex(lightHex), PixelCanvas.Hex(darkHex) };
-        }
-
         /// <summary>Desenha uma peça em uma camada separada, contorna e cola no resultado.</summary>
         private static void Stamp(PixelCanvas target, Action<PixelCanvas> draw)
         {
@@ -235,74 +231,6 @@ namespace Abissal.EditorTools
             draw(part);
             part.Outline(Ink);
             target.Stamp(part);
-        }
-
-        /// <summary>Cápsula com luz na parte de cima e sombra na de baixo.</summary>
-        private static void FillCapsule(PixelCanvas canvas, Vector2 from, Vector2 to, float radius, Color32[] shades)
-        {
-            Vector2 segment = to - from;
-            float lengthSquared = Mathf.Max(segment.sqrMagnitude, 0.0001f);
-
-            for (int y = 0; y < canvas.Height; y++)
-            {
-                for (int x = 0; x < canvas.Width; x++)
-                {
-                    var point = new Vector2(x, y);
-                    Vector2 closest = from + segment * Mathf.Clamp01(Vector2.Dot(point - from, segment) / lengthSquared);
-                    float distance = Vector2.Distance(point, closest);
-
-                    if (distance <= radius)
-                    {
-                        float height = (point.y - closest.y) / radius;
-                        canvas.Set(x, y, height > 0.45f ? shades[1] : height < -0.45f ? shades[2] : shades[0]);
-                    }
-                }
-            }
-        }
-
-        /// <summary>Círculo com aparência de esfera, iluminado de cima para baixo.</summary>
-        private static void FillSphere(PixelCanvas canvas, float centerX, float centerY, float radius, Color32[] shades)
-        {
-            for (int y = 0; y < canvas.Height; y++)
-            {
-                for (int x = 0; x < canvas.Width; x++)
-                {
-                    float dx = (x - centerX) / radius;
-                    float dy = (y - centerY) / radius;
-
-                    if (dx * dx + dy * dy > 1f)
-                    {
-                        continue;
-                    }
-
-                    // Luz e sombra seguem a borda do círculo, o que mantém o formato arredondado.
-                    float highlightX = dx + 0.3f;
-                    float highlightY = dy - 0.45f;
-                    float shadowX = dx - 0.1f;
-                    float shadowY = dy + 0.2f;
-                    bool isLit = highlightX * highlightX + highlightY * highlightY < 0.2f;
-                    bool isShadow = shadowX * shadowX + shadowY * shadowY > 0.72f && dy < 0.1f;
-
-                    canvas.Set(x, y, isLit ? shades[1] : isShadow ? shades[2] : shades[0]);
-                }
-            }
-        }
-
-        private static void FillDisc(PixelCanvas canvas, float centerX, float centerY, float radius, Color32 color)
-        {
-            for (int y = 0; y < canvas.Height; y++)
-            {
-                for (int x = 0; x < canvas.Width; x++)
-                {
-                    float dx = x - centerX;
-                    float dy = y - centerY;
-
-                    if (dx * dx + dy * dy <= radius * radius)
-                    {
-                        canvas.Set(x, y, color);
-                    }
-                }
-            }
         }
     }
 }

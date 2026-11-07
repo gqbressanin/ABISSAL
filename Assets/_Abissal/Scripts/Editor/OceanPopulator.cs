@@ -45,10 +45,12 @@ namespace Abissal.EditorTools
             var prefabs = new HazardPrefabs
             {
                 Spikes = SaveSpikesPrefab(),
-                Jellyfish = SaveJellyfishPrefab("AguaViva", "Creatures/jellyfish", litMaterial, false),
-                DeepJellyfish = SaveJellyfishPrefab("AguaVivaProfunda", "Creatures/jellyfish_deep", unlitMaterial, true),
-                BigFish = SavePredatorPrefab("PeixeGrande", "Creatures/bigfish", new Vector2(2.3f, 1f), new Vector2(0.2f, 0f), litMaterial, false, 9f, 5f, 6.6f),
-                Angler = SavePredatorPrefab("PeixeAbissal", "Creatures/angler", new Vector2(1.5f, 1.2f), new Vector2(0.1f, -0.2f), litMaterial, true, 7f, 6f, 5.6f),
+                Jellyfish = SaveDriftingPrefab("AguaViva", "Creatures/jellyfish", litMaterial, 0.6f, new Vector2(0f, 0.45f), false),
+                DeepJellyfish = SaveDriftingPrefab("AguaVivaProfunda", "Creatures/jellyfish_deep", unlitMaterial, 0.6f, new Vector2(0f, 0.45f), true),
+                Octopus = SaveDriftingPrefab("Polvo", "Creatures/octopus", litMaterial, 0.8f, new Vector2(0f, 0.35f), false),
+                Pufferfish = SaveDriftingPrefab("Baiacu", "Creatures/pufferfish", litMaterial, 0.7f, Vector2.zero, false),
+                BigFish = SavePredatorPrefab("PeixeGrande", "Creatures/bigfish", "Creatures/bigfish_attack", new Vector2(3.4f, 1.2f), new Vector2(0.4f, 0f), 1f, litMaterial, false, 9f, 5f, 6.6f),
+                Angler = SavePredatorPrefab("PeixeAbissal", "Creatures/angler", null, new Vector2(2.1f, 1.7f), new Vector2(0.2f, -0.2f), 0.9f, litMaterial, true, 7f, 6f, 5.6f),
                 Vent = SaveVentPrefab()
             };
 
@@ -66,6 +68,8 @@ namespace Abissal.EditorTools
             public GameObject Spikes;
             public GameObject Jellyfish;
             public GameObject DeepJellyfish;
+            public GameObject Octopus;
+            public GameObject Pufferfish;
             public GameObject BigFish;
             public GameObject Angler;
             public GameObject Vent;
@@ -119,6 +123,24 @@ namespace Abissal.EditorTools
             }
 
             PlacePatrol(zone, prefabs.BigFish, new Vector2(0f, -44f), -36f, 20f, 4f);
+
+            PlaceFloatingAnimal(zone, "Tartaruga", "Creatures/turtle", new Vector2(-6f, -6f), -18f, 16f, 0.9f, 4f, litMaterial);
+            PlaceFloatingAnimal(zone, "Tartaruga", "Creatures/turtle", new Vector2(10f, -38f), -20f, 38f, 1.1f, 4f, litMaterial);
+
+            foreach (int x in new[] { -13, -2, 12, 17 })
+            {
+                PlaceCrab(zone, x, -10);
+            }
+
+            foreach (int x in new[] { -24, 0, 26 })
+            {
+                PlaceCrab(zone, x, -44);
+            }
+
+            foreach (Vector2 position in new[] { new Vector2(38f, -47f), new Vector2(46f, -49f), new Vector2(-29f, -37f) })
+            {
+                PlaceSeahorse(zone, position);
+            }
         }
 
         private static void PopulateTwilightZone(Transform zone, HazardPrefabs prefabs)
@@ -185,6 +207,19 @@ namespace Abissal.EditorTools
 
             PlacePatrol(zone, prefabs.BigFish, new Vector2(0f, -92f), -32f, 32f, 4.5f);
             PlacePatrol(zone, prefabs.BigFish, new Vector2(-20f, -122f), -44f, 4f, 5f);
+
+            PlaceFloatingAnimal(zone, "Manta", "Creatures/manta", new Vector2(-10f, -82f), -30f, 28f, 1.4f, 3f, litMaterial);
+            PlaceFloatingAnimal(zone, "Manta", "Creatures/manta", new Vector2(-30f, -116f), -44f, 2f, 1.2f, 3f, litMaterial);
+
+            foreach (Vector2 position in new[] { new Vector2(-18f, -100f), new Vector2(18f, -101f), new Vector2(-36f, -125f) })
+            {
+                Instantiate(prefabs.Octopus, zone, position);
+            }
+
+            foreach (Vector2 position in new[] { new Vector2(6f, -90f), new Vector2(-6f, -122f) })
+            {
+                Instantiate(prefabs.Pufferfish, zone, position);
+            }
         }
 
         private static void PopulateAbyssZone(Transform zone, HazardPrefabs prefabs)
@@ -244,6 +279,13 @@ namespace Abissal.EditorTools
 
             PlacePatrol(zone, prefabs.Angler, new Vector2(10f, -158f), -20f, 42f, 3.5f);
             PlacePatrol(zone, prefabs.Angler, new Vector2(20f, -150f), -14f, 38f, 3f);
+
+            PlaceFloatingAnimal(zone, "Lula", "Creatures/squid", new Vector2(-8f, -152f), -20f, 40f, 1.6f, 5f, unlitMaterial);
+            PlaceFloatingAnimal(zone, "Lula", "Creatures/squid", new Vector2(24f, -164f), -18f, 42f, 1.3f, 5f, unlitMaterial);
+            PlaceFloatingAnimal(zone, "Lula", "Creatures/squid", new Vector2(-4f, -188f), -14f, 14f, 1f, 5f, unlitMaterial);
+
+            Instantiate(prefabs.Octopus, zone, new Vector2(28f, -166f));
+            Instantiate(prefabs.Pufferfish, zone, new Vector2(-10f, -162f));
         }
 
         private static int? FindFloor(int x, int fromY)
@@ -346,11 +388,51 @@ namespace Abissal.EditorTools
 
         private static SpriteRenderer PlaceFish(Transform parent, string framesPath, Vector2 position, float minX, float maxX, float speed)
         {
-            Sprite[] frames = LoadFrames(framesPath, 2);
+            Sprite[] frames = LoadFrames(framesPath, 4);
             SpriteRenderer fish = CreateSprite("Peixe", parent, frames[0], position, "Actors", 1, litMaterial);
             AddFrames(fish.gameObject, frames, 5f);
             ConfigureSwimmer(fish.gameObject.AddComponent<AmbientSwimmer>(), minX, maxX, speed);
             return fish;
+        }
+
+        private static void PlaceFloatingAnimal(Transform parent, string name, string framesPath, Vector2 position, float minX, float maxX, float speed, float fps, Material material)
+        {
+            Sprite[] frames = LoadFrames(framesPath, 4);
+            SpriteRenderer animal = CreateSprite(name, parent, frames[0], position, "Actors", 1, material);
+            AddFrames(animal.gameObject, frames, fps);
+            ConfigureSwimmer(animal.gameObject.AddComponent<AmbientSwimmer>(), minX, maxX, speed);
+        }
+
+        /// <summary>O caranguejo anda de um lado para o outro sobre o chão, sem flutuar.</summary>
+        private static void PlaceCrab(Transform parent, int x, int fromY)
+        {
+            if (!(FindFloor(x, fromY) is int floor))
+            {
+                return;
+            }
+
+            Sprite[] frames = LoadFrames("Creatures/crab", 4);
+            SpriteRenderer crab = CreateSprite("Caranguejo", parent, frames[0], new Vector3(x + 0.5f, floor + 1.4f), "Scenery", 13, litMaterial);
+            AddFrames(crab.gameObject, frames, 6f);
+
+            var swimmer = crab.gameObject.AddComponent<AmbientSwimmer>();
+            ConfigureSwimmer(swimmer, x - 1f, x + 2f, 0.5f);
+
+            var serialized = new SerializedObject(swimmer);
+            serialized.FindProperty("bobHeight").floatValue = 0f;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void PlaceSeahorse(Transform parent, Vector2 position)
+        {
+            Sprite[] frames = LoadFrames("Creatures/seahorse", 4);
+            SpriteRenderer seahorse = CreateSprite("Cavalo_Marinho", parent, frames[0], position, "Actors", 1, litMaterial);
+            AddFrames(seahorse.gameObject, frames, 4f);
+
+            var bob = new SerializedObject(seahorse.gameObject.AddComponent<GentleBob>());
+            bob.FindProperty("height").floatValue = 0.2f;
+            bob.FindProperty("tiltDegrees").floatValue = 4f;
+            bob.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void PlaceJellyfish(Transform parent, GameObject prefab, Vector2 position)
@@ -388,33 +470,34 @@ namespace Abissal.EditorTools
             return SavePrefab(spikes.gameObject);
         }
 
-        private static GameObject SaveJellyfishPrefab(string name, string framesPath, Material material, bool glows)
+        /// <summary>Perigo que flutua devagar: águas-vivas, polvos e baiacus.</summary>
+        private static GameObject SaveDriftingPrefab(string name, string framesPath, Material material, float radius, Vector2 offset, bool glows)
         {
             Sprite[] frames = LoadFrames(framesPath, 4);
-            SpriteRenderer jellyfish = CreateSprite(name, null, frames[0], Vector3.zero, "Actors", 2, material);
-            AddFrames(jellyfish.gameObject, frames, 4f);
-            jellyfish.gameObject.AddComponent<JellyfishMotion>();
+            SpriteRenderer creature = CreateSprite(name, null, frames[0], Vector3.zero, "Actors", 2, material);
+            AddFrames(creature.gameObject, frames, 4f);
+            creature.gameObject.AddComponent<JellyfishMotion>();
 
-            var body = jellyfish.gameObject.AddComponent<Rigidbody2D>();
+            var body = creature.gameObject.AddComponent<Rigidbody2D>();
             body.bodyType = RigidbodyType2D.Kinematic;
 
-            var circle = jellyfish.gameObject.AddComponent<CircleCollider2D>();
+            var circle = creature.gameObject.AddComponent<CircleCollider2D>();
             circle.isTrigger = true;
-            circle.radius = 0.55f;
-            circle.offset = new Vector2(0f, 0.25f);
-            jellyfish.gameObject.AddComponent<Hazard>();
+            circle.radius = radius;
+            circle.offset = offset;
+            creature.gameObject.AddComponent<Hazard>();
 
             if (glows)
             {
-                AddGlow(jellyfish.gameObject, Vector3.zero, 3.5f, 0.6f);
+                AddGlow(creature.gameObject, Vector3.zero, 3.5f, 0.6f);
             }
 
-            return SavePrefab(jellyfish.gameObject);
+            return SavePrefab(creature.gameObject);
         }
 
-        private static GameObject SavePredatorPrefab(string name, string framesPath, Vector2 colliderSize, Vector2 colliderOffset, Material material, bool hasLure, float detectionRange, float chaseSeconds, float chaseSpeed)
+        private static GameObject SavePredatorPrefab(string name, string framesPath, string attackFramesPath, Vector2 colliderSize, Vector2 colliderOffset, float bodyRadius, Material material, bool hasLure, float detectionRange, float chaseSeconds, float chaseSpeed)
         {
-            Sprite[] frames = LoadFrames(framesPath, 2);
+            Sprite[] frames = LoadFrames(framesPath, 4);
             SpriteRenderer predator = CreateSprite(name, null, frames[0], Vector3.zero, "Actors", 3, material);
             AddFrames(predator.gameObject, frames, 4f);
 
@@ -424,6 +507,20 @@ namespace Abissal.EditorTools
             chaseSettings.FindProperty("chaseSeconds").floatValue = chaseSeconds;
             chaseSettings.FindProperty("chaseSpeed").floatValue = chaseSpeed;
             chaseSettings.FindProperty("terrainMask").intValue = LayerMask.GetMask("Terrain");
+            chaseSettings.FindProperty("bodyRadius").floatValue = bodyRadius;
+
+            if (attackFramesPath != null)
+            {
+                Sprite[] attackFrames = LoadFrames(attackFramesPath, 4);
+                SerializedProperty attackList = chaseSettings.FindProperty("attackFrames");
+                attackList.arraySize = attackFrames.Length;
+
+                for (int i = 0; i < attackFrames.Length; i++)
+                {
+                    attackList.GetArrayElementAtIndex(i).objectReferenceValue = attackFrames[i];
+                }
+            }
+
             chaseSettings.ApplyModifiedPropertiesWithoutUndo();
 
             var body = predator.gameObject.AddComponent<Rigidbody2D>();
@@ -438,7 +535,7 @@ namespace Abissal.EditorTools
 
             if (hasLure)
             {
-                AddGlow(predator.gameObject, new Vector3(0f, 0.6f, 0f), 5f, 0.9f);
+                AddGlow(predator.gameObject, new Vector3(0.3f, 0.7f, 0f), 5f, 0.9f);
             }
 
             return SavePrefab(predator.gameObject);

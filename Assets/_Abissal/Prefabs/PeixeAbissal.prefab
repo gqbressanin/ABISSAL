@@ -84,7 +84,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.125, y: 1.875}
+  m_Size: {x: 2.875, y: 2.25}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -105,6 +105,8 @@ MonoBehaviour:
   frames:
   - {fileID: 21300000, guid: a227e4bd6547db54296aa2509d5679e3, type: 3}
   - {fileID: 21300000, guid: e0fcae5c00edd6d4ba85952ef2060602, type: 3}
+  - {fileID: 21300000, guid: 2f8d50b0e06ebbf4ab4fa18b6c06afb1, type: 3}
+  - {fileID: 21300000, guid: 904e60f0aa46c5e479c4dbbd24ea371a, type: 3}
   framesPerSecond: 4
   randomStart: 1
 --- !u!114 &3120909144971293288
@@ -132,8 +134,9 @@ MonoBehaviour:
   terrainMask:
     serializedVersion: 2
     m_Bits: 256
-  bodyRadius: 0.6
+  bodyRadius: 0.9
   alertColor: {r: 1, g: 0.5, b: 0.45, a: 1}
+  attackFrames: []
 --- !u!50 &7480573952033586841
 Rigidbody2D:
   serializedVersion: 4
@@ -193,8 +196,8 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.1, y: -0.2}
-  m_Size: {x: 1.5, y: 1.2}
+  m_Offset: {x: 0.2, y: -0.2}
+  m_Size: {x: 2.1, y: 1.7}
   m_Direction: 1
 --- !u!114 &4142150238392261298
 MonoBehaviour:
@@ -234,7 +237,7 @@ Transform:
   m_GameObject: {fileID: 8933606612694517932}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.6, z: 0}
+  m_LocalPosition: {x: 0.3, y: 0.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

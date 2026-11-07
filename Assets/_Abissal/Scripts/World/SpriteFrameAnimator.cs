@@ -20,6 +20,12 @@ namespace Abissal.World
             set => framesPerSecond = Mathf.Max(0.1f, value);
         }
 
+        public Sprite[] Frames
+        {
+            get => frames;
+            set => frames = value;
+        }
+
         private void Awake()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();

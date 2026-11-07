@@ -50,8 +50,13 @@ namespace Abissal.Hazards
         [SerializeField, Min(0.1f)] private float bodyRadius = 0.6f;
         [SerializeField] private Color alertColor = new Color(1f, 0.5f, 0.45f);
 
+        [Header("Aparência")]
+        [Tooltip("Opcional: quadros usados ao atacar, como a boca aberta do tubarão.")]
+        [SerializeField] private Sprite[] attackFrames;
+
         private SpriteRenderer spriteRenderer;
         private SpriteFrameAnimator animator;
+        private Sprite[] calmFrames;
         private PlayerHealth health;
         private Transform diver;
         private float homeY;
@@ -66,6 +71,7 @@ namespace Abissal.Hazards
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<SpriteFrameAnimator>();
+            calmFrames = animator.Frames;
             homeY = transform.position.y;
             patrolDirection = Random.value < 0.5f ? -1 : 1;
         }
@@ -245,7 +251,17 @@ namespace Abissal.Hazards
         {
             bool isAggressive = State == PredatorState.Alert || State == PredatorState.Chase;
 
-            spriteRenderer.color = isAggressive ? alertColor : Color.white;
+            bool hasAttackFrames = attackFrames != null && attackFrames.Length > 0;
+
+            // Com quadros de ataque, a boca aberta já mostra o perigo, então o tom fica só no alerta.
+            bool usesAlertTint = hasAttackFrames ? State == PredatorState.Alert : isAggressive;
+            spriteRenderer.color = usesAlertTint ? alertColor : Color.white;
+
+            if (hasAttackFrames)
+            {
+                animator.Frames = isAggressive ? attackFrames : calmFrames;
+            }
+
             animator.FramesPerSecond = State == PredatorState.Alert ? AlertFramesPerSecond
                 : State == PredatorState.Chase ? ChaseFramesPerSecond
                 : CalmFramesPerSecond;
