@@ -77,6 +77,18 @@ namespace Abissal.EditorTools
             }
         }
 
+        /// <summary>Cola os pixels preenchidos de outra tela do mesmo tamanho sobre esta.</summary>
+        public void Stamp(PixelCanvas other)
+        {
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                if (other.pixels[i].a != 0)
+                {
+                    pixels[i] = other.pixels[i];
+                }
+            }
+        }
+
         /// <summary>Pinta de contorno todo pixel vazio encostado em um pixel preenchido.</summary>
         public void Outline(Color32 color)
         {

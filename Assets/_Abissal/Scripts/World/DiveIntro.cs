@@ -51,6 +51,8 @@ namespace Abissal.World
 
         private IEnumerator Jump()
         {
+            // No barco ele usa a pose de pé. Ao saltar, a animação de nado assume o sprite.
+            diverAnimator.enabled = true;
             diver.SetParent(null, true);
             Vector3 start = diver.position;
             Vector3 end = new Vector3(waterEntryPoint.x, waterEntryPoint.y, start.z);

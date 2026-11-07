@@ -31,7 +31,7 @@ namespace Abissal.EditorTools
             GenerateCreatures();
             GenerateHazards();
             GenerateSamples();
-            GenerateDiver();
+            DiverArt.Generate(Root);
             GenerateBoat();
             GenerateEffects();
             GenerateTitle();
@@ -760,55 +760,6 @@ namespace Abissal.EditorTools
 
             canvas.Outline(PixelCanvas.Hex(outlineHex, 230));
             return canvas;
-        }
-
-        private static void GenerateDiver()
-        {
-            // Mergulhador de lado, de cabeça para a direita. Cada caractere é um pixel.
-            string[] body =
-            {
-                "...........kkkkkkk......",
-                "..........kbbbbbbbk.kkk.",
-                "..........kBBBBBBBkkyyyk",
-                "......kkkkkkkkkkkkkyggyk",
-                ".....kyyyyyyyyyyyyyyggyk",
-                ".....kyyoyyyyyyyyyyyyyk.",
-                ".....kkooooyyyoooookkk..",
-                "......kkkkkkkkkaaak.....",
-                "..............kyyk......",
-                "...............kk......."
-            };
-
-            string[][] fins =
-            {
-                new[] { ".kk..", "kffk.", "kfffk", ".kffk" },
-                new[] { ".....", "kkkk.", "kfffk", "kkkk." },
-                new[] { ".kffk", "kfffk", "kffk.", ".kk.." }
-            };
-
-            int[] finTopRows = { 8, 6, 5 };
-
-            var palette = new Dictionary<char, Color32>
-            {
-                { 'k', Ink },
-                { 'y', PixelCanvas.Hex("f4b92f") },
-                { 'o', PixelCanvas.Hex("c9701f") },
-                { 'b', PixelCanvas.Hex("9ab7c4") },
-                { 'B', PixelCanvas.Hex("5b7c8d") },
-                { 'g', PixelCanvas.Hex("8bf0ff") },
-                { 'a', PixelCanvas.Hex("e8a06a") },
-                { 'f', PixelCanvas.Hex("2fb3a3") }
-            };
-
-            System.Func<char, Color32?> lookup = c => palette.TryGetValue(c, out Color32 color) ? color : (Color32?)null;
-
-            for (int frame = 0; frame < fins.Length; frame++)
-            {
-                var canvas = new PixelCanvas(24, 12);
-                canvas.DrawRows(0, 11, body, lookup);
-                canvas.DrawRows(0, finTopRows[frame], fins[frame], lookup);
-                canvas.Save(Root + $"Characters/diver_swim_{frame}.png");
-            }
         }
 
         private static void GenerateBoat()
