@@ -21,7 +21,9 @@ namespace Abissal.UI
         [Header("Amostras")]
         [SerializeField] private SampleTracker sampleTracker;
         [SerializeField] private SampleCollector sampleCollector;
-        [SerializeField] private Text samplesLabel;
+        [SerializeField] private PixelText samplesLine;
+        [SerializeField] private PixelText mainSampleLine;
+        [SerializeField] private PixelText completionLine;
         [SerializeField] private CanvasGroup collectPrompt;
         [SerializeField] private Color normalTextColor = Color.white;
         [SerializeField] private Color collectedTextColor = new Color(1f, 0.85f, 0.35f);
@@ -61,7 +63,8 @@ namespace Abissal.UI
 
         private void Update()
         {
-            group.alpha = GameManager.Instance.State == GameState.Playing ? 1f : 0f;
+            GameState state = GameManager.Instance.State;
+            group.alpha = state == GameState.Playing || state == GameState.Paused ? 1f : 0f;
             oxygenFill.fillAmount = oxygen.Normalized;
             oxygenFill.color = CurrentOxygenColor();
             RefreshSamples();
@@ -70,12 +73,15 @@ namespace Abissal.UI
         private void RefreshSamples()
         {
             string mainStatus = sampleTracker.HasMainSample ? "coletada" : "pendente";
-            samplesLabel.text = $"Amostras: {sampleTracker.SecondaryCollected}/{sampleTracker.SecondaryTotal}\n"
-                + $"Principal: {mainStatus}\n"
-                + $"Conclusão: {sampleTracker.CompletionPercent}%";
+            samplesLine.SetText($"Amostras: {sampleTracker.SecondaryCollected}/{sampleTracker.SecondaryTotal}");
+            mainSampleLine.SetText($"Principal: {mainStatus}");
+            completionLine.SetText($"Conclusão: {sampleTracker.CompletionPercent}%");
 
             bool justCollected = Time.time < lastCollectedTime + collectedFlashSeconds;
-            samplesLabel.color = justCollected ? collectedTextColor : normalTextColor;
+            Color textColor = justCollected ? collectedTextColor : normalTextColor;
+            samplesLine.Color = textColor;
+            mainSampleLine.Color = textColor;
+            completionLine.Color = textColor;
             collectPrompt.alpha = sampleCollector.NearbySample != null ? 1f : 0f;
         }
 

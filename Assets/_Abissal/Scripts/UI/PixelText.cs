@@ -29,6 +29,11 @@ namespace Abissal.UI
             get => color;
             set
             {
+                if (color == value)
+                {
+                    return;
+                }
+
                 color = value;
 
                 foreach (Image letter in letters)

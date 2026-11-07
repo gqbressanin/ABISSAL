@@ -33,6 +33,7 @@ namespace Abissal.Core
             }
 
             Instance = this;
+            Time.timeScale = 1f;
         }
 
         private void OnDestroy()
@@ -48,6 +49,34 @@ namespace Abissal.Core
             if (State == GameState.Playing)
             {
                 ExpeditionSeconds += Time.deltaTime;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                TogglePause();
+            }
+        }
+
+        /// <summary>No jogo instalado, sair da janela pausa a partida para o oxigênio não acabar sozinho.</summary>
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (!hasFocus && !Application.isEditor && State == GameState.Playing)
+            {
+                TogglePause();
+            }
+        }
+
+        public void TogglePause()
+        {
+            if (State == GameState.Playing)
+            {
+                Time.timeScale = 0f;
+                SetState(GameState.Paused);
+            }
+            else if (State == GameState.Paused)
+            {
+                Time.timeScale = 1f;
+                SetState(GameState.Playing);
             }
         }
 

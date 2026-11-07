@@ -885,6 +885,8 @@ namespace Abissal.EditorTools
 
         private static void GenerateInterface()
         {
+            DrawLabel("PAUSADO", "f2fffb", 3).Save(Root + "UI/pause_title.png");
+            DrawLabel("PRESSIONE ESC PARA CONTINUAR", "f2fffb", 1).Save(Root + "UI/pause_prompt.png");
             DrawLabel("ESPAÇO PARA COLETAR", "ffe08a", 1).Save(Root + "UI/prompt_collect.png");
             DrawLabel("A AMOSTRA PRINCIPAL AINDA NÃO FOI COLETADA", "ff9a7a", 1).Save(Root + "UI/objective_missing.png");
             DrawLabel("MISSÃO CONCLUÍDA", "ffe08a", 2).Save(Root + "UI/victory_title.png");

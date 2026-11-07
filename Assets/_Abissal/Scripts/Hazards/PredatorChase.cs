@@ -87,7 +87,10 @@ namespace Abissal.Hazards
 
         private void Update()
         {
-            if (State != PredatorState.Patrol && GameManager.Instance.State != GameState.Playing)
+            GameState gameState = GameManager.Instance.State;
+            bool isExpeditionRunning = gameState == GameState.Playing || gameState == GameState.Paused;
+
+            if (State != PredatorState.Patrol && !isExpeditionRunning)
             {
                 GiveUp();
             }

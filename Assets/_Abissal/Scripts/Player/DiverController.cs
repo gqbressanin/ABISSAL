@@ -60,6 +60,13 @@ namespace Abissal.Player
         private void OnStateChanged(GameState state)
         {
             HasControl = state == GameState.Playing;
+
+            // Na pausa o tempo já está parado, e a velocidade precisa ser mantida para a volta.
+            if (state == GameState.Paused)
+            {
+                return;
+            }
+
             body.simulated = HasControl;
 
             if (!HasControl)

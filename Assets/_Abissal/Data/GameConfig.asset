@@ -15,6 +15,11 @@ MonoBehaviour:
   maxSpeed: 6
   acceleration: 20
   deceleration: 12
+  oxygenSeconds: 210
+  lowOxygenWarning: 0.25
+  startingLives: 3
+  invulnerabilitySeconds: 1.5
+  hitKnockbackSpeed: 7
   metersPerUnit: 5
   maxDepthMeters: 1000
   worldLeft: -60
